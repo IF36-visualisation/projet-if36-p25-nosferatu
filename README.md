@@ -17,7 +17,7 @@ Le dataset est un fichier CSV, où chaque ligne représente un joueur et chaque 
 ### Plan d’analyse
 Afin de mieux comprendre et exploiter les données, nous avons élaboré le plan d’analyse suivant :
 
-1.Nettoyage et prétraitement des données
+#### 1.Nettoyage et prétraitement des données
 
 Vérification de la présence de valeurs manquantes ou aberrantes dans le dataset
 
@@ -25,31 +25,31 @@ Vérification de l’uniformisation des formats (noms de pays, abréviations des
 
 Vérification et correction des types de données, en s’assurant que les champs numériques sont bien au format approprié
 
-2.Analyse statistique descriptive
+#### 2.Analyse statistique descriptive
 
 Description des variables à l’aide de statistiques de base (moyenne, médiane, écart-type, etc.)
 
 Visualisation de la distribution globale des données (histogrammes, diagrammes en boîte, etc.)
 
-3.Comparaison des performances selon les postes
+#### 3.Comparaison des performances selon les postes
 
 Analyse de la répartition de l’âge, du nombre de buts et de passes décisives par poste
 
 Comparaison des données offensives entre les attaquants, les milieux de terrain et les défenseurs
 
-4.Analyse par club et nationalité
+#### 4.Analyse par club et nationalité
 
 Identification des clubs ou pays formant le plus grand nombre de joueurs de haut niveau
 
 Évaluation des performances moyennes des joueurs selon leur club, afin de repérer d’éventuelles différences significatives
 
-5.Analyse croisée et visualisation avancée
+#### 5.Analyse croisée et visualisation avancée
 
 Exploration des relations linéaires ou non linéaires entre plusieurs variables numériques
 
 Visualisation des corrélations pour mieux comprendre les liens entre les différentes dimensions des données
 
-6.Découverte de talents et prédictions (optionnel, selon pertinence)
+#### 6.Découverte de talents et prédictions (optionnel, selon pertinence)
 
 Identification de groupes de joueurs présentant des caractéristiques de performance similaires
 
