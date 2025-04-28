@@ -83,3 +83,87 @@ Concernant les Anglais, leur moyenne est relativement basse, mais on observe bea
 
 ## Conclusion
 Notre analyse montre que oui, certaines nationalités marquent plus que d'autres en Premier League. Les Sud-Américains, notamment les Argentins et les Brésiliens, dominent grâce à une culture du football profondément ancrée, où la formation technique et la passion pour ce sport sont omniprésentes dès l'enfance. À leurs côtés, plusieurs nationalités européennes comme la Belgique ou la France affichent également de très bonnes performances, en lien avec des systèmes de formation rigoureux et compétitifs. Les joueurs anglais, bien qu'en surnombre, présentent une forte hétérogénéité : si certains comptent parmi les meilleurs buteurs, d'autres, moins performants, tirent la moyenne nationale vers le bas, reflet du fait que la Premier League offre davantage d'opportunités aux joueurs locaux, quel que soit leur niveau. Ainsi, si la nationalité influence clairement la capacité à marquer, elle interagit aussi avec d’autres facteurs essentiels comme la formation, la sélection sportive et l’accès au championnat.
+
+
+
+
+---
+title: "position"
+author: "Ziyi HUANG"
+output: html_document
+date: "2025-04-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+La prochaine question que nous examinerons est la suivante :
+
+**Quelles sont les différences de moyenne de buts marqués selon la position ?**
+
+
+```{r cars}
+library(dplyr)
+library(ggplot2)
+
+df <- read.csv("C:/Users/emma_/Desktop/premier_league_dataset.csv")
+
+df_clean <- df %>%
+  filter(!is.na(Position), !is.na(Goals)) %>%
+  mutate(Position = case_when(
+    grepl("Goalkeeper", Position, ignore.case = TRUE) ~ "Goalkeeper",
+    grepl("Defender", Position, ignore.case = TRUE) ~ "Defender",
+    grepl("Midfielder", Position, ignore.case = TRUE) ~ "Midfielder",
+    grepl("Forward", Position, ignore.case = TRUE) ~ "Forward",
+    TRUE ~ "Other"
+  )) %>%
+  filter(Position %in% c("Goalkeeper", "Defender", "Midfielder", "Forward"))  
+
+position_stats <- df_clean %>%
+  group_by(Position) %>%
+  summarise(
+    mean_goals = mean(Goals, na.rm = TRUE),
+    sd_goals = sd(Goals, na.rm = TRUE),
+    count = n()
+  )
+
+print(position_stats)
+```
+
+```{r pressure, echo=FALSE}
+ggplot(position_stats, aes(x = Position, y = mean_goals)) +
+  geom_col(fill = "skyblue", color = "black") +
+  #geom_errorbar(aes(ymin = mean_goals - sd_goals, ymax = mean_goals + sd_goals),
+                #width = 0.2, color = "red", linewidth = 1) +
+  labs(
+    title = "Nombre moyen de buts marqués par les joueurs à différents postes",
+    x = "position",
+    y = "Moyenne des buts"
+  ) +
+  theme_minimal()
+
+ggplot(df_clean, aes(x = Position, y = Goals)) +
+  geom_boxplot(fill = "lightblue", color = "black", outlier.color = "red", outlier.shape = 16) +
+  labs(
+    title = "Répartition des buts marqués par des joueurs occupant différents postes (graphique en boîte)",
+    x = "position",
+    y = "nombre de buts marqués"
+  ) +
+  theme_minimal()
+
+```
+
+**Ceci peut être analysé à l'aide du diagramme à barres et du diagramme en boîte :  **
+
+1.Dans l'ensemble, les attaquants et les milieux de terrain sont chargés de marquer des buts, tandis que les défenseurs et les gardiens de but sont chargés de défendre.
+
+2.Les attaquants sont ceux qui marquent le plus de buts dans l'ensemble, mais leurs performances sont très variables, quelques rares grands buteurs tirant la moyenne générale vers le haut.
+
+3.Les milieux de terrain ont une capacité moyenne à marquer des buts, mais certains d'entre eux sont très impressionnants sur le plan offensif. Cela montre qu'il ne faut pas négliger la capacité des milieux de terrain à marquer des buts, et que certains d'entre eux ont une forte capacité à s'impliquer.
+
+4.Les défenseurs ont marqué très peu de buts et la différence globale est faible, mais certains défenseurs ont tout de même marqué un peu plus sur coups de pied arrêtés.
+
+5.Les gardiens de but ne marquent pratiquement pas de buts et sont extrêmement réguliers.
