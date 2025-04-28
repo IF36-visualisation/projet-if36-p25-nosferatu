@@ -2,9 +2,11 @@
 title: "Livrable 1 - Nosferatu"
 author: "Hong Phuoc DINH, Daria AVDEEVA, Ziyi HUANG, Victor LATH"
 date: "2025-04-26"
-output: html_document
-editor_options: 
-  markdown: 
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  markdown:
     wrap: sentence
 ---
 
@@ -34,9 +36,9 @@ library(fmsb)
 data<-read.csv("data/premier_league_dataset.csv")
 ```
 
-## Question 1: Les joueurs de certaines nationalités marquent-ils plus que d’autres ?
+# Question 1: Les joueurs de certaines nationalités marquent-ils plus que d’autres ?
 
-### Top 10 Joueurs avec leurs nationalité
+## Top 10 Joueurs avec leurs nationalité
 
 ```{r}
 top_joueurs <- data %>% arrange(desc(Goals)) %>% slice_head(n = 10) 
@@ -55,7 +57,7 @@ D'abord, nous avons analysé les 10 meilleurs buteurs de la Premier League.
 On remarque que, mis à part le meilleur buteur, qui est Argentin, la majorité des joueurs présents dans ce top 10 sont Européens, notamment beaucoup d’Anglais.
 Un seul joueur africain figure parmi eux : Mohamed Salah, de nationalité égyptienne.
 
-### Moyenne des buts par nationalité (Top 10 pays)
+## Moyenne des buts par nationalité (Top 10 pays)
 
 ```{r}
 top_nation <- data %>% group_by(Nationality) %>% filter(n() >= 10) %>% summarise(avg_goals=mean(Goals,na.rm = TRUE)) %>% arrange(desc(avg_goals)) %>% slice_head(n = 10) 
@@ -69,7 +71,7 @@ ggplot(top_nation,aes(x = Nationality, y = avg_goals))+geom_bar(stat="identity",
 On observe alors que l'Argentine affiche la meilleure moyenne, suivie de la Belgique, du Brésil, puis de la France, etc.
 Ainsi, l’Amérique du Sud occupe la première et la troisième place, tandis que les autres nationalités du top 10 sont principalement européennes et anglais.Cette forte présence sud-américaine (Argentine, Brésil) peut s'expliquer par la culture football très forte dans ces pays, où le football est souvent considéré comme une véritable passion nationale, produisant de nombreux joueurs talentueux dès le plus jeune âge.
 
-### Distribution des buts par nationalité (Top 10 pays)
+## Distribution des buts par nationalité (Top 10 pays)
 
 ```{r}
 top_nation_data <-data %>%
@@ -91,7 +93,7 @@ En revanche, les joueurs de Belgique, du Brésil, de France, d’Irlande et d’
 
 Concernant les Anglais, leur moyenne est relativement basse, mais on observe beaucoup d'outliers positifs : cela suggère qu’il existe à la fois de très bons joueurs (qui marquent beaucoup) et de nombreux joueurs moyens ou faibles, ce qui fait baisser la moyenne globale.Cela s'explique en partie par le fait que la Premier League est un championnat anglais, avec naturellement un plus grand nombre de joueurs anglais, donc plus de chances d'avoir à la fois des stars et des joueurs moins performants.
 
-### Conclusion
+## Conclusion
 
 Notre analyse montre que oui, certaines nationalités marquent plus que d'autres en Premier League.
 Les Sud-Américains, notamment les Argentins et les Brésiliens, dominent grâce à une culture du football profondément ancrée, où la formation technique et la passion pour ce sport sont omniprésentes dès l'enfance.
@@ -99,13 +101,13 @@ Les Sud-Américains, notamment les Argentins et les Brésiliens, dominent grâce
 Les joueurs anglais, bien qu'en surnombre, présentent une forte hétérogénéité : si certains comptent parmi les meilleurs buteurs, d'autres, moins performants, tirent la moyenne nationale vers le bas, reflet du fait que la Premier League offre davantage d'opportunités aux joueurs locaux, quel que soit leur niveau.
 Ainsi, si la nationalité influence clairement la capacité à marquer, elle interagit aussi avec d’autres facteurs essentiels comme la formation, la sélection sportive et l’accès au championnat.
 
-## Question 2: Quel est l'impact de l'âge sur les performances des joueurs ?
+# Question 2: Quel est l'impact de l'âge sur les performances des joueurs ?
 
 ```{r}
 summary(data)
 ```
 
-### Préparation et analyse des données
+## Préparation et analyse des données
 
 Lorsqu'on regarde l'état du dataset, on constate qu'il y a une donnée manquante dans la feature "Age", qu'il faut donc supprimer.
 
@@ -114,7 +116,7 @@ df <- data %>%
   filter(!is.na(Age))
 
 #On vérifie que la suppression a bien été prise en compte
-summary(df)
+summary(df$Age)
 ```
 
 Intéressons nous au différentes positions des joueurs.
@@ -164,7 +166,7 @@ df <- df %>%
 unique(df$Performance.class)
 ```
 
-### Visualisation
+## Visualisation
 
 ```{r}
 ggplot(df, aes(x = Age, y = Performance, color = Performance.class)) +
@@ -174,19 +176,20 @@ ggplot(df, aes(x = Age, y = Performance, color = Performance.class)) +
   labs(title = "Performance des joueurs de Premiere League en fonction de l'âge et par position",
        x = "Âge",
        y = "Performance",
-       color = "Performance") +
+       color = "Action") +
   
   #Esthétique
   theme_minimal(base_size = 10) +
   theme(
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 12),
-    plot.subtitle = element_text(hjust = 0.5, size = 11),
-    strip.text = element_text(face = "bold", size = 10),
-    axis.text = element_text(size = 10),
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 10),
+    strip.text = element_text(face = "bold", size = 9),
+    axis.text = element_text(size = 9),
     legend.position = "bottom"
     )
 
 ```
+
+## Analyse
 
 Dans le cas des **défendants**, on constate que les performances augmentent notamment après 27 ans.
 On peut cependant remarquer une forte dispersion à partir de 33 ans.
@@ -204,7 +207,7 @@ En général, les performances augmentent généralement avec l’âge, mais de 
 Par contre, les gardiens ont une carrière relativement plus longue, avec un pic de performance plus tardif.
 Enfin, pour toutes les positions, on remarque une dispersion assez importante : il y a de jeunes joueurs très performants et de plus âgés peu performants dans chaque poste.
 
-## Question 3:Quelles sont les différences de moyenne de buts marqués selon la position ?
+# Question 3:Quelles sont les différences de moyenne de buts marqués selon la position ?
 
 ```{r}
 df_clean <- df %>%
@@ -252,7 +255,7 @@ ggplot(df_clean, aes(x = Position, y = Goals)) +
 
 ```
 
-### Ceci peut être analysé à l'aide du diagramme à barres et du diagramme en boîte :
+## Ceci peut être analysé à l'aide du diagramme à barres et du diagramme en boîte :
 
 1.Dans l'ensemble, les attaquants et les milieux de terrain sont chargés de marquer des buts, tandis que les défenseurs et les gardiens de but sont chargés de défendre.
 
@@ -265,7 +268,7 @@ Cela montre qu'il ne faut pas négliger la capacité des milieux de terrain à m
 
 5.Les gardiens de but ne marquent pratiquement pas de buts et sont extrêmement réguliers.
 
-## Question 4: Quels sont les joueurs les plus efficaces pour marquer des buts ?
+# Question 4: Quels sont les joueurs les plus efficaces pour marquer des buts ?
 
 La question de savoir quels joueurs sont les plus efficaces pour marquer des buts est importante dans le football.
 Elle n'est pas aussi facile à répondre qu'il n'y parait.
@@ -285,7 +288,7 @@ data_clean <- data %>%
   mutate(Goals_per_match = Goals / Appearances)  
 ```
 
-### Les joueurs qui marquent le plus de but sur l'ensemble de la Premier League
+## Les joueurs qui marquent le plus de but sur l'ensemble de la Premier League
 
 L'objectif de se poser cette question, c'est d'avoir une idée de la performance des joueurs en termes de buts marqués.
 On va donc se concentrer sur les joueurs qui ont marqué le plus de buts.
@@ -308,7 +311,7 @@ top_scorer_plot
 
 On constate que les meilleurs buteurs marquent au moins plus de 50 buts dans leurs carrière et peuvent marquer plus de 100 buts.
 
-### Vérifier la distribution de nombre de buts par match
+## Vérifier la distribution de nombre de buts par match
 
 Cependant, connaître le nombre de but marqué au total par joueurs ne suffit pas.
 Parce que certains joueurs ont joué plus de matchs que d'autres et donc le nombre de but marqué.
@@ -328,7 +331,7 @@ goals_distribution_corrected
 L'idée est de se faire une idée de la distribution des buts par match et de savoir sur tous les joueurs y compris ceux qui n'ont pas marqué de but, combien de joueurs ont marqué.
 On peut constaté qu'une minorité de joueurs ont marqué plus de 0.5 buts par match.
 
-### Top 10 des joueurs ayant une moyenne de buts les plus élevées
+## Top 10 des joueurs ayant une moyenne de buts les plus élevées
 
 On va maintenant se concentrer sur les joueurs qui ont marqué le plus de buts par match
 
@@ -350,7 +353,7 @@ bar_chart
 
 On constate que les meilleurs joueurs en termes de buts par match font au moins 0.4 buts par match.
 
-### L'impact de la précision du tir sur les buts par matchs
+## L'impact de la précision du tir sur les buts par matchs
 
 Maintenant, on va se poser la question de savoir si au football et notamment dans la Premier League, la précision du tir a un impact sur le nombre de buts marqués par match.
 
@@ -367,7 +370,7 @@ ggplot(data_clean, aes(x = Shooting.accuracy.., y = Goals_per_match)) +
 On constate qu'il y a une corrélation positive entre la précision des tirs et le nombre de buts marqués par match.
 La précision des tirs est donc un facteur important pour marquer des buts.
 
-### Comparaison du top 3 par rapports à la moyenne des joueurs de la Premier league
+## Comparaison du top 3 par rapports à la moyenne des joueurs de la Premier league
 
 On va maintenant se concentrer sur les 3 meilleurs joueurs et la moyenne des joueurs de la Premier League.
 L'objectif est de voir sur les 3 meilleurs joueurs qu'on peut considérer les plus efficaces devant les buts.
