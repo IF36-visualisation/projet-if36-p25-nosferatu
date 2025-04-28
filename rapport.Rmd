@@ -1,0 +1,85 @@
+---
+title: "if36_epl"
+author: "Hong Phuoc DINH"
+date: "2025-04-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Introduction 
+Dans ce projet, nous allons explorer et analyser un dataset contenant des informations sur les joueurs de Premier League.
+L'objectif principal est de mieux comprendre les performances individuelles et collectives à travers différentes dimensions statistiques.
+Pour cela, nous allons formuler plusieurs questions d’analyse qui nous guideront tout au long de l’exploration.
+Les questions sont:\
+1. Les joueurs de certaines nationalités marquent-ils plus que d’autres ?\
+2.\
+3.\
+4.\
+
+
+
+```{r cars}
+library(ggplot2)
+library(dplyr)
+data<-read.csv("data/premier_league_dataset.csv")
+```
+
+## Question 1: Les joueurs de certaines nationalités marquent-ils plus que d’autres ? 
+
+### Top 10 Joueurs avec leurs nationalité
+```{r}
+top_joueurs <- data %>% arrange(desc(Goals)) %>% slice_head(n = 10) 
+top_joueurs <- top_joueurs %>%
+  mutate(label = paste(Name, "(", Nationality, ")", sep = ""))
+
+ggplot(top_joueurs, aes(x = reorder(label, Goals), y = Goals)) +
+  geom_col(fill = "skyblue", color = "darkblue") +
+  theme_minimal() +
+  labs(title = "Top 10 des meilleurs buteurs",
+       x = "Joueur (Nationalité)",
+       y = "Nombre de buts")+coord_flip()
+```
+
+D'abord, nous avons analysé les 10 meilleurs buteurs de la Premier League.
+On remarque que, mis à part le meilleur buteur, qui est Argentin, la majorité des joueurs présents dans ce top 10 sont Européens, notamment beaucoup d’Anglais.
+Un seul joueur africain figure parmi eux : Mohamed Salah, de nationalité égyptienne.
+
+### Moyenne des buts par nationalité (Top 10 pays)
+```{r}
+top_nation <- data %>% group_by(Nationality) %>% filter(n() >= 10) %>% summarise(avg_goals=mean(Goals,na.rm = TRUE)) %>% arrange(desc(avg_goals)) %>% slice_head(n = 10) 
+
+ggplot(top_nation,aes(x = Nationality, y = avg_goals))+geom_bar(stat="identity",fill = "skyblue", color = "darkblue") +theme_minimal() +
+  labs(title = "Moyenne des buts par nationalité (Top 10 pays)",
+       x = "Nationalité",
+       y = "Moyenne de buts") 
+```
+
+On observe alors que l'Argentine affiche la meilleure moyenne, suivie de la Belgique, du Brésil, puis de la France, etc.
+Ainsi, l’Amérique du Sud occupe la première et la troisième place, tandis que les autres nationalités du top 10 sont principalement européennes et anglais.Cette forte présence sud-américaine (Argentine, Brésil) peut s'expliquer par la culture football très forte dans ces pays, où le football est souvent considéré comme une véritable passion nationale, produisant de nombreux joueurs talentueux dès le plus jeune âge.
+
+### Distribution des buts par nationalité (Top 10 pays)
+
+```{r}
+top_nation_data <-data %>%
+  filter(Nationality %in% top_nation$Nationality)
+
+ggplot(top_nation_data, aes(x = Nationality, y = Goals)) +
+theme_minimal() +  
+  geom_boxplot(fill = "skyblue", color = "darkblue") +
+  labs(title = "Distribution des buts par nationalité (Top 10 pays)",
+       x = "Nationalité",
+       y = "Nombre de buts")
+
+```
+
+Pour aller plus loin, nous avons observé la distribution du nombre de buts par nationalité à l’aide de boîtes à moustaches (boxplots).
+
+On remarque que l'Argentine n’est pas systématiquement performante : c’est principalement grâce à un seul joueur, Aguero, dont le nombre de buts exceptionnel fait fortement augmenter la moyenne.
+En revanche, les joueurs de Belgique, du Brésil, de France, d’Irlande et d’Écosse présentent des distributions assez semblables.
+
+Concernant les Anglais, leur moyenne est relativement basse, mais on observe beaucoup d'outliers positifs : cela suggère qu’il existe à la fois de très bons joueurs (qui marquent beaucoup) et de nombreux joueurs moyens ou faibles, ce qui fait baisser la moyenne globale.Cela s'explique en partie par le fait que la Premier League est un championnat anglais, avec naturellement un plus grand nombre de joueurs anglais, donc plus de chances d'avoir à la fois des stars et des joueurs moins performants.
+
+## Conclusion
+Notre analyse montre que oui, certaines nationalités marquent plus que d'autres en Premier League. Les Sud-Américains, notamment les Argentins et les Brésiliens, dominent grâce à une culture du football profondément ancrée, où la formation technique et la passion pour ce sport sont omniprésentes dès l'enfance. À leurs côtés, plusieurs nationalités européennes comme la Belgique ou la France affichent également de très bonnes performances, en lien avec des systèmes de formation rigoureux et compétitifs. Les joueurs anglais, bien qu'en surnombre, présentent une forte hétérogénéité : si certains comptent parmi les meilleurs buteurs, d'autres, moins performants, tirent la moyenne nationale vers le bas, reflet du fait que la Premier League offre davantage d'opportunités aux joueurs locaux, quel que soit leur niveau. Ainsi, si la nationalité influence clairement la capacité à marquer, elle interagit aussi avec d’autres facteurs essentiels comme la formation, la sélection sportive et l’accès au championnat.
