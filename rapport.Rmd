@@ -252,7 +252,7 @@ ggplot(df_clean, aes(x = Position, y = Goals)) +
 
 ```
 
-###Ceci peut être analysé à l'aide du diagramme à barres et du diagramme en boîte :
+### Ceci peut être analysé à l'aide du diagramme à barres et du diagramme en boîte :
 
 1.Dans l'ensemble, les attaquants et les milieux de terrain sont chargés de marquer des buts, tandis que les défenseurs et les gardiens de but sont chargés de défendre.
 
@@ -274,9 +274,6 @@ même si elle est importante.
 
 Pour commencer l'analyse, on va tous d'abord regarder au niveau global, c'est-à-dire dans l'ensemble de la Premier League, quels sont les joueurs qui ont marqué le plus de buts.
 
-```{r}
-data <- read.csv("C:\\Users\\lathv\\Desktop\\dataset - premier-league.csv", header = TRUE, sep = ",")
-```
 
 On constate qu'il ya des joueurs qui ont joués peu de match ce qui peut rendre les statistiques moins fiables donc on va se limiter aux joueurs ayant plus de 15 apparitions.
 
