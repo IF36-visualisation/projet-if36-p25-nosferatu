@@ -1,5 +1,6 @@
 ---
 title: "position"
+author: "Ziyi HUANG"
 output: html_document
 date: "2025-04-28"
 ---
@@ -15,14 +16,14 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r cars}
-# 加载必要库
+
 library(dplyr)
 library(ggplot2)
 
-# 读取数据
+
 df <- read.csv("C:/Users/emma_/Desktop/premier_league_dataset.csv")
 
-# 简单数据清理
+
 df_clean <- df %>%
   filter(!is.na(Position), !is.na(Goals)) %>%  # 保留有位置和进球数据的球员
   mutate(Position = case_when(
@@ -34,7 +35,7 @@ df_clean <- df %>%
   )) %>%
   filter(Position != "Other")  # 排除分类不明确的球员
 
-# 计算每个位置的平均进球数
+
 position_goals <- df_clean %>%
   group_by(Position) %>%
   summarise(
@@ -50,7 +51,6 @@ print(position_goals)
 
 
 ```{r pressure, echo=FALSE}
-# 绘制柱状图
 ggplot(position_goals, aes(x = Position, y = avg_goals)) +
   geom_col(fill = "skyblue", color = "black") +
   labs(title = "Nombre moyen de buts marqués par les joueurs à différents postes", x = "placement", y = "Moyenne des buts") +
