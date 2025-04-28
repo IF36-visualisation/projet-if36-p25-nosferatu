@@ -23,7 +23,7 @@ Les questions sont:\
 ```{r cars}
 library(ggplot2)
 library(dplyr)
-data<-read.csv("C:\\Users\\dacha\\OneDrive\\Bureau\\if36_data\\premier_league_dataset.csv")
+data<-read.csv("data/premier_league_dataset.csv")
 ```
 
 ## Question 1: Les joueurs de certaines nationalités marquent-ils plus que d’autres ? 
