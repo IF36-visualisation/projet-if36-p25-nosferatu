@@ -1,6 +1,6 @@
 ---
-title: "if36_epl"
-author: "Hong Phuoc DINH"
+title: "Livrable 1 - Nosferatu"
+author: "Hong Phuoc DINH, Daria AVDEEVA"
 date: "2025-04-26"
 output: html_document
 ---
@@ -14,7 +14,7 @@ L'objectif principal est de mieux comprendre les performances individuelles et c
 Pour cela, nous allons formuler plusieurs questions d’analyse qui nous guideront tout au long de l’exploration.
 Les questions sont:\
 1. Les joueurs de certaines nationalités marquent-ils plus que d’autres ?\
-2.\
+2. Quel est l'impact de l'âge sur les performances des joueurs ?\
 3.\
 4.\
 
@@ -23,7 +23,7 @@ Les questions sont:\
 ```{r cars}
 library(ggplot2)
 library(dplyr)
-data<-read.csv("data/premier_league_dataset.csv")
+data<-read.csv("C:\\Users\\dacha\\OneDrive\\Bureau\\if36_data\\premier_league_dataset.csv")
 ```
 
 ## Question 1: Les joueurs de certaines nationalités marquent-ils plus que d’autres ? 
@@ -81,5 +81,101 @@ En revanche, les joueurs de Belgique, du Brésil, de France, d’Irlande et d’
 
 Concernant les Anglais, leur moyenne est relativement basse, mais on observe beaucoup d'outliers positifs : cela suggère qu’il existe à la fois de très bons joueurs (qui marquent beaucoup) et de nombreux joueurs moyens ou faibles, ce qui fait baisser la moyenne globale.Cela s'explique en partie par le fait que la Premier League est un championnat anglais, avec naturellement un plus grand nombre de joueurs anglais, donc plus de chances d'avoir à la fois des stars et des joueurs moins performants.
 
-## Conclusion
+### Conclusion
 Notre analyse montre que oui, certaines nationalités marquent plus que d'autres en Premier League. Les Sud-Américains, notamment les Argentins et les Brésiliens, dominent grâce à une culture du football profondément ancrée, où la formation technique et la passion pour ce sport sont omniprésentes dès l'enfance. À leurs côtés, plusieurs nationalités européennes comme la Belgique ou la France affichent également de très bonnes performances, en lien avec des systèmes de formation rigoureux et compétitifs. Les joueurs anglais, bien qu'en surnombre, présentent une forte hétérogénéité : si certains comptent parmi les meilleurs buteurs, d'autres, moins performants, tirent la moyenne nationale vers le bas, reflet du fait que la Premier League offre davantage d'opportunités aux joueurs locaux, quel que soit leur niveau. Ainsi, si la nationalité influence clairement la capacité à marquer, elle interagit aussi avec d’autres facteurs essentiels comme la formation, la sélection sportive et l’accès au championnat.
+
+## Question 2: Quel est l'impact de l'âge sur les performances des joueurs ?
+
+```{r}
+summary(data)
+```
+### Préparation et analyse des données
+
+Lorsqu'on regarde l'état du dataset, on constate qu'il y a une donnée manquante dans la feature "Age", qu'il faut donc supprimer.
+
+```{r}
+df <- data %>% 
+  filter(!is.na(Age))
+
+#On vérifie que la suppression a bien été prise en compte
+summary(df)
+```
+
+Intéressons nous au différentes positions des joueurs.
+
+```{r}
+unique(df$Position)
+```
+Pour chaque feature, on étudiera la performance de manière différente. En effet, ça n'a pas de sens de s'intéresser au nombre de buts marqués pour un Defender par exemple. 
+
+Pour le **Goalkeeper**, on va s'intéresser à la feature *Saves*, car elle mesure sa capacité à arrêter les tirs adverses, ce qui est essentiel pour juger la performance d'un gardien
+
+Pour le **Defender**, on va s'intéresser à la feature *Interceptions*, car elle mesure sa capacité à couper les passes adverses, ce qui permet de limiter les occasions de but et sécuriser la défense.
+
+Pour le **Midfielder**, on va s'intéresser à la feature *Assists*, car elle reflète sa capacité à créer des occasions décisives dans le match
+
+Pour le **Forward**, on va s'intéresser à la feature *Goals*, car c'est l'indicateur principal de son efficacité offensive, marquer des buts étant sa contribution principale attendue pour faire gagner son équipe.
+
+```{r}
+
+df <- df %>%
+  mutate(
+    # Calcul de la Performance
+    Performance = case_when(
+      Position == "Goalkeeper" & !is.na(Saves) ~ Saves,
+      Position == "Defender" & !is.na(Interceptions) ~ Interceptions,
+      Position == "Midfielder" & !is.na(Assists) ~ Assists,
+      Position == "Forward" & !is.na(Goals) ~ Goals,
+      TRUE ~ NA_real_ #met une valeur manquante si les conditions ne sont pas remplies
+    ),
+    
+    # Définition de la classe de la performance (feature associée)
+    Performance.class = case_when(
+      Position == "Goalkeeper" & !is.na(Saves) ~ "Saves",
+      Position == "Defender" & !is.na(Interceptions) ~ "Interceptions",
+      Position == "Midfielder" & !is.na(Assists) ~ "Assists",
+      Position == "Forward" & !is.na(Goals) ~ "Goals",
+      TRUE ~ NA_character_ #met une valeur manquante si les conditions ne sont pas remplies
+    )
+  )
+
+ 
+```
+
+```{r}
+unique(df$Performance.class)
+```
+
+### Visualisation
+
+```{r}
+ggplot(df, aes(x = Age, y = Performance, color = Performance.class)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_smooth(method = "loess", color = "red") +
+  facet_wrap(~Position, scales = "free_y") +
+  labs(title = "Performance des joueurs de Premiere League en fonction de l'âge et par position",
+       x = "Âge",
+       y = "Performance",
+       color = "Performance") +
+  
+  #Esthétique
+  theme_minimal(base_size = 10) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 12),
+    plot.subtitle = element_text(hjust = 0.5, size = 11),
+    strip.text = element_text(face = "bold", size = 10),
+    axis.text = element_text(size = 10),
+    legend.position = "bottom"
+    )
+
+```
+
+Dans le cas des **défendants**, on constate que les performances augmentent notamment après 27 ans. On peut cependant remarquer une forte dispersion à partir de 33 ans. 
+
+Dans le cas des **attaquants**, la progression du nombre de buts marqués augmente également avec l'âge. Cependant, cette augmentation est plus lente et progressive que celle des défendants. 
+
+Dans le cas des **gardiens**, la progression monte jusqu'aux environs de 33 - 34 ans, puis baisse. On peut donc estimer que le gardien aurait la meilleure performance à 33 - 34 ans. Néanmoins, les performances sont très dispersées d'un gardien à un autre.
+
+Dans le cas des **joueurs du milieu**, la performance est assez faible et stagnante jusqu'aux environs de 30 ans, puis il y a une augmentation assez remarquable. 
+
+En général, les performances augmentent généralement avec l’âge, mais de manière plus rapide chez les défenseurs que dans les autres positions. Par contre, les gardiens ont une carrière relativement plus longue, avec un pic de performance plus tardif. Enfin, pour toutes les positions, on remarque une dispersion assez importante : il y a de jeunes joueurs très performants et de plus âgés peu performants dans chaque poste.
