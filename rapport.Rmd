@@ -1,6 +1,6 @@
 ---
 title: "Livrable 1 - Nosferatu"
-author: "Hong Phuoc DINH, Daria AVDEEVA"
+author: "Hong Phuoc DINH, Daria AVDEEVA, Ziyi HUANG, Victor LATH"
 date: "2025-04-26"
 output: html_document
 editor_options: 
