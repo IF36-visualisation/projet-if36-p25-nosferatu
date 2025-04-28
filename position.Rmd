@@ -1,0 +1,82 @@
+---
+title: "position"
+output: html_document
+date: "2025-04-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+# 加载必要库
+library(dplyr)
+library(ggplot2)
+
+# 读取数据
+df <- read.csv("C:/Users/emma_/Desktop/premier_league_dataset.csv")
+
+# 简单数据清理
+df_clean <- df %>%
+  filter(!is.na(Position), !is.na(Goals)) %>%  # 保留有位置和进球数据的球员
+  mutate(Position = case_when(
+    grepl("Goalkeeper", Position, ignore.case = TRUE) ~ "Goalkeeper",
+    grepl("Defender", Position, ignore.case = TRUE) ~ "Defender",
+    grepl("Midfielder", Position, ignore.case = TRUE) ~ "Midfielder",
+    grepl("Forward", Position, ignore.case = TRUE) ~ "Forward",
+    TRUE ~ "Other"
+  )) %>%
+  filter(Position != "Other")  # 排除分类不明确的球员
+
+# 计算每个位置的平均进球数
+position_goals <- df_clean %>%
+  group_by(Position) %>%
+  summarise(
+    count = n(),
+    total_goals = sum(Goals, na.rm = TRUE),
+    avg_goals = mean(Goals, na.rm = TRUE)
+  )
+
+print(position_goals)
+
+```
+
+
+
+```{r pressure, echo=FALSE}
+# 绘制柱状图
+ggplot(position_goals, aes(x = Position, y = avg_goals)) +
+  geom_col(fill = "skyblue", color = "black") +
+  labs(title = "Nombre moyen de buts marqués par les joueurs à différents postes", x = "placement", y = "Moyenne des buts") +
+  theme_minimal()
+```
+
+**Comme le montre le graphique à l'adresse **
+
+1. les attaquants (Forward) ont la meilleure moyenne de buts marqués, bien plus que n'importe quelle autre position.
+Cela tombe sous le sens, car la priorité d'un attaquant est de marquer des buts.
+
+2. les milieux de terrain ont une moyenne d'environ 7 buts. Bien qu'inférieure à celle des attaquants, cette moyenne est beaucoup plus élevée que celle des défenseurs et des gardiens de but. Cela signifie que certains milieux de terrain (tels que les milieux offensifs) ont également une forte capacité à marquer des buts.
+
+3. Le nombre moyen de buts marqués par les défenseurs 
+est beaucoup plus faible que celui des milieux de terrain et des attaquants.
+Cela signifie que les défenseurs sont encore principalement responsables de la défense et qu'ils marquent occasionnellement sur des coups de pied arrêtés (corners, coups francs).
+
+4. Les gardiens de but ont une moyenne de presque 0 but. 
+C'est normal, après tout, les gardiens de but marquent très rarement des buts.
+
+
+**Globalement :** 
+
+1. Il existe une corrélation positive très nette entre la position et le nombre de buts marqués : du gardien de but à l'attaquant, le nombre de buts marqués augmente progressivement.
+2) La capacité de l'attaquant à marquer des buts ne peut être égalée par aucun autre joueur.
+3) Globalement, les attaquants et les milieux de terrain sont chargés de marquer des buts, tandis que les défenseurs et les gardiens de but sont chargés de défendre.
+4) La capacité des milieux de terrain à marquer des buts ne peut être ignorée, surtout dans le football moderne où de nombreux milieux de terrain ont une forte capacité d'intervention et d'attaque.
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
