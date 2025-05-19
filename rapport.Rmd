@@ -1,5 +1,5 @@
 ---
-title: "Livrable 1 - Nosferatu"
+title: "IF36 - Rapport de projet"
 author: "Hong Phuoc DINH, Daria AVDEEVA, Ziyi HUANG, Victor LATH"
 date: "2025-04-26"
 output:
@@ -16,18 +16,24 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-Dans ce projet, nous allons explorer et analyser un dataset contenant des informations sur les joueurs de Premier League.
-L'objectif principal est de mieux comprendre les performances individuelles et collectives à travers différentes dimensions statistiques.
-Pour cela, nous allons formuler plusieurs questions d’analyse qui nous guideront tout au long de l’exploration.
-Les questions sont:\
-1.
-Les joueurs de certaines nationalités marquent-ils plus que d’autres ?\
-2.
-Quel est l'impact de l'âge sur les performances des joueurs ?\
-3.
-Quelles sont les différences de moyenne de buts marqués selon la position ?\
-4.
-Quels sont les joueurs les plus efficaces pour marquer des buts ?
+## Présentation des données
+
+Les données utilisées proviennent du dataset intitulé “All Time Premier League Player”. Ce dataset représente les statistiques des joueurs de toutes les saisons de la Premier League. Ce dataset a été trouvé sur kaggle, dont l'auteur est Rishikesh Kanabar, mais il est constitué de données provenant de https://www.premierleague.com/ . Ces données sont intéressantes pour l'analyse des performances individuelles et collectives des joueurs participant à la Premier League. De plus, elles peuvent être utiles dans l'analyse sportive, puisqu'elles permettent de comparer les performances entre les différents joueurs et les différentes équipes, repérer des talents émergents et aider à une meilleure prise de décision pour les entraîneurs ainsi que les analystes sportifs.\
+
+Le dataset est constitué de **571 joueurs et de 59 variables**. Parmi elles, on retrouve des:
+
+- variables textuelles (ex: Name, Club, Nationality)
+- variables continues (ex: Age, Goals, Shots)
+- variables catégorielles (ex: Postion, qui ne prend que les valeurs “Forward”, “Goalkeeper”, “Defender”, “Midfielder”)
+
+Le dataset est un fichier CSV, où chaque ligne représente un joueur et chaque colonne représente une variable. 
+
+Voici un résumé du dataset:
+
+```{r}
+data<-read.csv("data/premier_league_dataset.csv")
+summary(data)
+```
 
 ```{r cars}
 library(ggplot2)
