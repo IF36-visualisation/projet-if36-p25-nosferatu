@@ -500,3 +500,175 @@ On constate que par rapport à la moyenne des joueurs de la Premier League, les 
 Ce ne sont pas des joueurs qui ont beaucoup de passes ou qui gagnent beaucoup de duels.
 Cependant, ils ont quand même un nombre d'assists supérieur à la moyenne des joueurs de la Premier League.
 Ce qui montre qu'ils sont aussi de bon passeur permettant à leur équipe de marquer.
+
+
+# Question 5 : Quels sont les joueurs les moins disciplinés et est-ce qu'ils valent le coup ?
+
+L'objectif de cette question est de savoir si un club a un réel intérêt de garder et/ou d'envoyer des joueurs "problématiques" sur le terrain. À première vue, on peut supposer que non, étant donné que lorsque les joueurs commettent des fautes ou reçoivent des cartons, l'ensemble de l'équipe est pénalisé (penalty, expulsion du joueur,...).
+
+Pour répondre à cette question, nous allons nous intéresser aux 10 joueurs les moins disciplinés de la Premiere League.
+
+Tout d'abord, nous allons nous intéresser au nombre de fautes commises, ainsi que les cartons rouges et jaunes reçus.
+
+```{r echo=FALSE}
+
+#Filtrage du dataset
+df_4 <- data %>%
+  select(Name, Fouls, Yellow.cards, Red.cards) %>%
+  mutate(total = Fouls + Yellow.cards + Red.cards) %>% #On combine toutes les fautes pour chaque joueur 
+  arrange(desc(total)) %>%
+  slice_max(order_by = total, n = 10) %>% #On limite le nombre de joueurs à 10
+  pivot_longer(cols = c(Fouls, Yellow.cards, Red.cards),
+               names_to = "Type",
+               values_to = "Count")
+
+#Visualisation
+ggplot(df_4, aes(x = reorder(Name, Count), y = Count, fill = Type)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  scale_fill_manual(values = c("Fouls" = "steelblue", 
+                               "Yellow.cards" = "gold", 
+                               "Red.cards" = "red")) +
+  labs(title = "Fautes et cartons des 10 joueurs les plus sanctionnés en Premiere League",
+       x = "Joueur",
+       y = "Nombre total de fautes comises",
+       fill = "Type de faute") +
+  
+  #Esthétique
+  theme_minimal(base_size = 10) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 10),
+    strip.text = element_text(face = "bold", size = 9),
+    axis.text = element_text(size = 9),
+    legend.position = "bottom"
+    )
+
+```
+
+Il faut tout de même noter que les fautes (Fouls) ont une gravité très légère, mais leurs conséquences peuvent être un coup franc ou un penalty, ce qui peut pénaliser l'équipe du joueur fautif.
+Les cartons jaunes et rouges ont des gravités plus élevées, d'autant plus que deux cartons jaunes ont le même effet qu'un carton rouge, à savoir l'expulsion du joueur, et son équipe qui sera désavantagée car elle jouera 10 contre 11.
+Pour répondre à notre problématique, on va s'intéresser à l'ensemble des fautes commises, sans prendre en compte la gravité de ces dernières dans nos visualisations.
+
+Néanmoins, on peut prendre du recul sur la visualisation obtenue, en supposant que les joueurs Shane Long et James McArthur peuvent être considérés comme étant plus disciplinés que Phil Bardsley, étant donné qu'ils n'ont jamais reçus de cartons rouges.
+
+Maintenant, pour chacun des 10 joueurs, intéressons nous également à leurs performances, à savoir aux features *Goals*, *Assists* et *Interceptions*.
+
+Afin de pouvoir les comparer directement avec les fautes commises et les cartons reçus, nous allons réaliser un spider plot pour chacun des joueurs.
+
+```{r echo=FALSE}
+top10_joueurs <- df_4 %>% distinct(Name) %>% pull(Name)
+
+df_radar <- data %>%
+  filter(Name %in% top10_joueurs) %>%
+  select(Name, Position, Fouls, Yellow.cards, Red.cards, Goals, Assists, Interceptions)
+
+normalize <- function(x) {
+  (x - min(x, na.rm=TRUE)) / (max(x, na.rm=TRUE) - min(x, na.rm=TRUE))
+}
+
+df_radar_norm <- df_radar %>%
+  mutate(
+    Fouls = normalize(Fouls),
+    Yellow.cards = normalize(Yellow.cards),
+    Red.cards = normalize(Red.cards),
+    Goals = normalize(Goals),
+    Assists = normalize(Assists),
+    Interceptions = normalize(Interceptions)
+  )
+
+radar_data <- rbind(
+  max = rep(1, 6),
+  min = rep(0, 6),
+  df_radar_norm %>% select(Fouls, Yellow.cards, Red.cards, Goals, Assists, Interceptions)
+)
+
+rownames(radar_data) <- c("Max", "Min", df_radar_norm$Name)
+
+cols <- qualitative_hcl(6, palette = "Dark3")
+
+par(mfrow = c(2, 3), mar = c(1, 1, 3, 1))
+
+for (i in 3:(nrow(radar_data))) {
+  player_name <- rownames(radar_data)[i]
+  player_position <- df_radar_norm %>% filter(Name == player_name) %>% pull(Position)
+  
+  radarchart(
+    radar_data[c(1, 2, i), ],
+    pcol = cols[(i - 2) %% length(cols) + 1],
+    pfcol = alpha(cols[(i - 2) %% length(cols) + 1], 0.3),
+    plwd = 2,
+    cglcol = "grey",
+    cglty = 1,
+    axistype = 1,
+    title = paste0(player_name, " (Position: ", player_position, ")"),
+    vlcex = 0.8
+  )
+}
+```
+
+Dans ces spider plots, chaque valeur est normalisée entre 0 et 1 pour permettre une comparaison équitable entre variables.
+On a donc 0 qui représente le score le plus bas observé parmi les joueurs analysés, et le 1 représente le score le plus élevé.
+
+En analysant ces spider plots, on peut remarquer que:
+
+**Phil Bardsley**, qui a un très grand nombre de cartons jaunes (proche de 100%), réalise aussi un grand nombre d'interceptions (75%), ce qui est intéressant étant donné qu'il occupe la position *Defender*.
+Autrement dit, même s'il ne réalise pas de *Goals* ni d'*Assists*, ces performances sont tout de même intéressantes lorsqu'on le compare avec les 10 joueurs les moins disciplinés.
+
+**Christian Benteke** a un nombre assez elevé de cartons rouges (supérieur à 50%), mais c'est aussi celui qui réalise le plus grand nombre de buts marqués parmis les joueurs analysés.
+
+**James Milner**, qui serait le joueur le moins discipliné et qui possède le plus grand nombre de *Fouls* parmis les dix joueurs observés, ainsi que des valeurs assez élevées (supérieures à 50%) pour *Yellow.cars* et *Red.cards*, a également le plus grand nombre d'*Assists*, et des valeurs élevées pour *Interceptions* et *Goals*.
+
+**Mark Noble** est le joueur qui a reçu le plus de cartons jaunes et rouges, mais c'est aussi celui qui réalise le plus d'*Interceptions* parmis les 10 joueurs analysés.
+Etant donné que sa position est *Midfielder*, on peut supposer qu'il réalise de bonnes performances parmis les dix joueurs analysés.
+
+En comparant ces joueurs dans le sous-ensemble des dix joueurs auxquels on s'intéresse, on peut supposer que les joueurs les moins disciplinés ont quand même tendance à bien performer sur le terrain.
+Néanmoins, cette permière hypothèse est biaisée, étant donné qu'on compare ces joueurs non-disciplinés aux autres joueurs non-disciplinés.
+
+Réalisons une visualisation afin de les comparer à la moyenne globale des performances, c'est-à-dire en prenant en compte les performances de tous les joueurs de la Premiere League.
+
+```{r echo=FALSE}
+#Joueurs qu'on souhaite comparer à la moyenne
+joueurs_cibles <- c("Phil Bardsley", "Christian Benteke", "James Milner", "Mark Noble")
+
+df_joueurs <- data %>%
+  filter(Name %in% joueurs_cibles) %>%
+  select(Name, Goals, Assists, Interceptions)
+
+# Moyenne sur tous les joueurs sauf les gardiens
+df_moyenne <- data %>%
+  filter(Position != "Goalkeeper") %>%
+  summarise(across(c(Goals, Assists, Interceptions), mean, na.rm = TRUE)) %>%
+  mutate(Name = "Moyenne") %>%
+  select(Name, everything())
+
+df_comparatif <- bind_rows(df_joueurs, df_moyenne)
+
+df_long <- df_comparatif %>%
+  pivot_longer(cols = -Name, names_to = "Variable", values_to = "Valeur")
+
+#Visualisation
+ggplot(df_long, aes(x = Variable, y = Valeur, fill = Name)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
+  scale_fill_brewer(palette = "Set1") +
+  labs(title = "Comparaison des performances des joueurs avec la moyenne (hors gardiens)",
+       x = "Statistique",
+       y = "Valeur") +
+  
+  #Esthétique
+  theme_minimal(base_size = 10) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 10),
+    strip.text = element_text(face = "bold", size = 9),
+    axis.text = element_text(size = 9),
+    legend.position = "bottom"
+  )
+
+```
+
+On remarque que la tendance générale est que les performances des joueurs non-disciplinés sont bien supérieures à la moyenne.
+Même si Phil Bardsley est inférieur à la moyenne dans les features *Assists* et *Goals*, il est largement supérieur dans la feature *Interceptions*.
+Etant donné que Phil Bardsley occupe le poste *Defender*, ses performances sont mesurées majoritairement avec le nombre d'interceptions réalisés, donc on peut supposer que c'est tout de même un bon joueur.
+
+En conclusion, les joueurs les moins disciplinés, autrement dit ceux qui commettent le plus de fautes et reçoivent le plus de cartons jaunes et/ou rouges, restent tout de même des joueurs avec des performances bien supérieures à la moyenne et peuvent donc être intéressants à avoir sur le terrain.
+On peut supposer que ce paradoxe s'explique par le fait qu'ils ont tendance à prendre davantage de risques, même si ces derniers peuvent leur valoir des cartons.
+Néanmoins, en prenant ces risques, ils augmentent leurs chances de faire des passes décisives, intercepter les ballons ou encore marquer des buts.
