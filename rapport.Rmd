@@ -161,15 +161,11 @@ Ainsi, si la nationalité influence clairement la capacité à marquer, elle int
 
 # Question 2: Quel est l'impact de l'âge sur les performances des joueurs ?
 
-```{r}
-summary(data)
-```
-
 ## Préparation et analyse des données
 
 Lorsqu'on regarde l'état du dataset, on constate qu'il y a une donnée manquante dans la feature "Age", qu'il faut donc supprimer.
 
-```{r}
+```{r echo=FALSE}
 df <- data %>% 
   filter(!is.na(Age))
 
@@ -177,9 +173,9 @@ df <- data %>%
 summary(df$Age)
 ```
 
-Intéressons nous au différentes positions des joueurs.
+Intéressons-nous maintenant aux différentes positions des joueurs.
 
-```{r}
+```{r echo=FALSE}
 unique(df$Position)
 ```
 
@@ -194,7 +190,7 @@ Pour le **Midfielder**, on va s'intéresser à la feature *Assists*, car elle re
 
 Pour le **Forward**, on va s'intéresser à la feature *Goals*, car c'est l'indicateur principal de son efficacité offensive, marquer des buts étant sa contribution principale attendue pour faire gagner son équipe.
 
-```{r}
+```{r echo=FALSE}
 
 df <- df %>%
   mutate(
@@ -226,7 +222,7 @@ unique(df$Performance.class)
 
 ## Visualisation
 
-```{r}
+```{r echo=FALSE}
 ggplot(df, aes(x = Age, y = Performance, color = Performance.class)) +
   geom_point(alpha = 0.6, size = 2) +
   geom_smooth(method = "loess", color = "red") +
