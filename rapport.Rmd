@@ -91,6 +91,8 @@ Analyse des nationalités dominantes
 library(ggplot2)
 library(dplyr)
 library(fmsb)
+library(tidyr)
+library(colorspace)
 data<-read.csv("data/premier_league_dataset.csv")
 ```
 
@@ -98,7 +100,7 @@ data<-read.csv("data/premier_league_dataset.csv")
 
 ## Top 10 Joueurs avec leurs nationalité
 
-```{r}
+```{r echo=FALSE}
 top_joueurs <- data %>% arrange(desc(Goals)) %>% slice_head(n = 10) 
 top_joueurs <- top_joueurs %>%
   mutate(label = paste(Name, "(", Nationality, ")", sep = ""))
@@ -117,7 +119,7 @@ Un seul joueur africain figure parmi eux : Mohamed Salah, de nationalité égypt
 
 ## Moyenne des buts par nationalité (Top 10 pays)
 
-```{r}
+```{r echo=FALSE}
 top_nation <- data %>% group_by(Nationality) %>% filter(n() >= 10) %>% summarise(avg_goals=mean(Goals,na.rm = TRUE)) %>% arrange(desc(avg_goals)) %>% slice_head(n = 10) 
 
 ggplot(top_nation,aes(x = Nationality, y = avg_goals))+geom_bar(stat="identity",fill = "skyblue", color = "darkblue") +theme_minimal() +
@@ -131,7 +133,7 @@ Ainsi, l’Amérique du Sud occupe la première et la troisième place, tandis q
 
 ## Distribution des buts par nationalité (Top 10 pays)
 
-```{r}
+```{r echo=FALSE}
 top_nation_data <-data %>%
   filter(Nationality %in% top_nation$Nationality)
 
@@ -263,7 +265,7 @@ Enfin, pour toutes les positions, on remarque une dispersion assez importante : 
 
 # Question 3:Quelles sont les différences de moyenne de buts marqués selon la position ?
 
-```{r}
+```{r echo=FALSE}
 df_clean <- df %>%
   filter(!is.na(Position), !is.na(Goals)) %>%
   mutate(Position = case_when(
@@ -334,7 +336,7 @@ Pour commencer l'analyse, on va tous d'abord regarder au niveau global, c'est-à
 
 On constate qu'il ya des joueurs qui ont joués peu de match ce qui peut rendre les statistiques moins fiables donc on va se limiter aux joueurs ayant plus de 15 apparitions.
 
-```{r}
+```{r echo=FALSE}
 seuil_apparitions <- 15 
 
 data_clean <- data %>%
@@ -347,7 +349,7 @@ data_clean <- data %>%
 L'objectif de se poser cette question, c'est d'avoir une idée de la performance des joueurs en termes de buts marqués.
 On va donc se concentrer sur les joueurs qui ont marqué le plus de buts.
 
-```{r}
+```{r echo=FALSE}
 # Sélectionner les 10 meilleurs buteurs
 top_scorers <- data_clean %>%
   arrange(desc(Goals)) %>%
@@ -373,7 +375,7 @@ C'est pourquoi, on va se concentrer sur le nombre de buts marqué par match.
 
 Le jeu de données possèdent des valeurs aberrantes dans la variable goals per match , que nous avons dû corrigé en la recalculant nous même.
 
-```{r}
+```{r echo=FALSE}
 goals_distribution_corrected <- ggplot(data_clean, aes(x = Goals_per_match)) +
   geom_histogram(binwidth = 0.05, fill = "steelblue", color = "black", boundary = 0) +
   labs(title = "Distribution des nombres de buts par match",
@@ -389,7 +391,7 @@ On peut constaté qu'une minorité de joueurs ont marqué plus de 0.5 buts par m
 
 On va maintenant se concentrer sur les joueurs qui ont marqué le plus de buts par match
 
-```{r}
+```{r echo=FALSE}
 top_10_players <- data_clean %>%
   arrange(desc(Goals_per_match)) %>% 
   head(10) %>%
@@ -411,7 +413,7 @@ On constate que les meilleurs joueurs en termes de buts par match font au moins 
 
 Maintenant, on va se poser la question de savoir si au football et notamment dans la Premier League, la précision du tir a un impact sur le nombre de buts marqués par match.
 
-```{r}
+```{r echo=FALSE}
 
 data_clean$`Shooting.accuracy..` <- as.numeric(gsub("%", "", data_clean$`Shooting.accuracy..`)) / 100
 
@@ -430,7 +432,7 @@ On va maintenant se concentrer sur les 3 meilleurs joueurs et la moyenne des jou
 L'objectif est de voir sur les 3 meilleurs joueurs qu'on peut considérer les plus efficaces devant les buts.
 Il y'a-t-il un joueur qui se démarque des autres ou il y a-t-il une variable qui fait que certains joueurs marquent plus de buts que d'autres.
 
-```{r}
+```{r echo=FALSE}
 library(dplyr)
 library(fmsb)
 
