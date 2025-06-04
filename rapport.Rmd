@@ -30,7 +30,7 @@ Le dataset est un fichier CSV, où chaque ligne représente un joueur et chaque 
 
 Voici un résumé du dataset:
 
-```{r}
+```{r echo=FALSE}
 data<-read.csv("data/premier_league_dataset.csv")
 summary(data)
 ```
@@ -87,7 +87,7 @@ Analyse des nationalités dominantes
 - Pistes d’amélioration pour une analyse plus approfondie
 
 
-```{r cars}
+```{r cars, echo=FALSE}
 library(ggplot2)
 library(dplyr)
 library(fmsb)
@@ -165,8 +165,12 @@ Ainsi, si la nationalité influence clairement la capacité à marquer, elle int
 
 ## Préparation et analyse des données
 
-Lorsqu'on regarde l'état du dataset, on constate qu'il y a une donnée manquante dans la feature "Age", qu'il faut donc supprimer.
+Lorsqu'on regarde l'état du dataset, on constate qu'il y a une donnée manquante dans la feature "Age":
+```{r echo=FALSE}
+summary(data$Age)
+```
 
+On supprime donc la valeur manquante. Cette suppression n'a aucun impact sur la suite de notre analyse.
 ```{r echo=FALSE}
 df <- data %>% 
   filter(!is.na(Age))
@@ -175,7 +179,7 @@ df <- data %>%
 summary(df$Age)
 ```
 
-Intéressons-nous maintenant aux différentes positions des joueurs.
+Les différentes positions des joueurs recensées dans le dataset sont:
 
 ```{r echo=FALSE}
 unique(df$Position)
@@ -218,7 +222,7 @@ df <- df %>%
  
 ```
 
-```{r}
+```{r echo=FALSE}
 unique(df$Performance.class)
 ```
 
@@ -598,7 +602,7 @@ for (i in 3:(nrow(radar_data))) {
     cglcol = "grey",
     cglty = 1,
     axistype = 1,
-    title = paste0(player_name, " (Position: ", player_position, ")"),
+    title = paste0(player_name),
     vlcex = 0.8
   )
 }
