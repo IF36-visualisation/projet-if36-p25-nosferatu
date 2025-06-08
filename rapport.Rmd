@@ -93,6 +93,7 @@ library(dplyr)
 library(fmsb)
 library(tidyr)
 library(colorspace)
+library(GGally)
 data<-read.csv("data/premier_league_dataset.csv")
 ```
 
@@ -674,3 +675,59 @@ Etant donné que Phil Bardsley occupe le poste *Defender*, ses performances sont
 En conclusion, les joueurs les moins disciplinés, autrement dit ceux qui commettent le plus de fautes et reçoivent le plus de cartons jaunes et/ou rouges, restent tout de même des joueurs avec des performances bien supérieures à la moyenne et peuvent donc être intéressants à avoir sur le terrain.
 On peut supposer que ce paradoxe s'explique par le fait qu'ils ont tendance à prendre davantage de risques, même si ces derniers peuvent leur valoir des cartons.
 Néanmoins, en prenant ces risques, ils augmentent leurs chances de faire des passes décisives, intercepter les ballons ou encore marquer des buts.
+
+# Question 6 : Quels postes sont les plus exposés aux sanctions en Premier League ?
+
+Pour répondre à cette question, nous avons calculé les moyennes des fautes, des cartons jaunes et rouges par poste (Forward, Midfielder, Defender, Goalkeeper), sur l’ensemble des joueurs de Premier League. L’objectif est de comparer le comportement disciplinaire moyen selon le rôle sur le terrain.
+Nous avons utilisé un graphique en coordonnées parallèles pour visualiser ces différences : chaque ligne correspond à un poste, et les axes représentent les trois types de sanctions, normalisés pour permettre une comparaison équitable.
+
+```{r echo=FALSE}
+df_parallel <- data %>%
+  group_by(Position) %>%
+  summarise(
+    Fouls = mean(Fouls, na.rm = TRUE),
+    Yellow.cards = mean(Yellow.cards, na.rm = TRUE),
+    Red.cards = mean(Red.cards, na.rm = TRUE)
+  )
+
+ggparcoord(
+  df_parallel,
+  columns = 2:4, 
+  groupColumn = "Position", 
+  scale = "globalminmax", 
+  alphaLines = 0.7, 
+  showPoints = TRUE 
+) +
+  scale_color_viridis_d(name = "Poste") + 
+  labs(
+    title = "Comparaison des sanctions moyennes par poste",
+    x = "Type de sanction",
+    y = "Moyenne normalisée"
+  ) +
+  theme_minimal(base_size = 10) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "right"
+  )
+```
+
+### Résultats observés
+L’analyse montre des différences intéressantes entre les postes :
+
+**Fautes (Fouls)** : Ce sont les attaquants (Forwards) qui commettent en moyenne le plus de fautes. Cela peut surprendre, mais s’explique par leur pression constante sur les défenseurs et gardiens adverses. Ils sont suivis par les milieux de terrain, puis les défenseurs, tandis que les gardiens (Goalkeepers) commettent très peu de fautes.
+
+**Cartons jaunes (Yellow cards)** : Ce sont cette fois les milieux de terrain (Midfielders) qui reçoivent le plus de cartons jaunes, ce qui s’explique par leur implication dans les phases défensives et offensives, souvent dans des zones à fort engagement physique. Ils sont suivis par les défenseurs, puis les attaquants, et enfin les gardiens, très peu sanctionnés.
+
+**Cartons rouges (Red cards)** : La tendance est assez similaire à celle des cartons jaunes, avec les milieux et les défenseurs légèrement au-dessus, suivis des attaquants. Les gardiens reçoivent très peu de cartons rouges, ce qui confirme leur faible exposition aux fautes graves.
+
+### Conclusion : Ce que révèle la discipline par poste
+À première vue, on pourrait s’attendre à ce que les défenseurs (Defenders) soient les plus fautifs, ce qui est logique vu leur rôle défensif, mais ce n’est finalement pas le cas, ce qui est surprenant.
+
+**Forwards (attaquants)** : Commettent le plus de fautes, souvent liées au pressing, mais reçoivent peu de cartons, ce qui indique des fautes peu graves.
+
+**Midfielders (milieux)** : Ce sont les joueurs les plus sanctionnés globalement (fautes, jaunes, rouges). Leur rôle de pivot sur le terrain les expose à de nombreux duels et fautes tactiques.
+
+**Defenders (défenseurs)** : Bien que très sollicités défensivement, ils ne sont pas systématiquement les plus sanctionnés, ce qui peut indiquer une plus grande maîtrise dans l’engagement physique.
+
+**Goalkeepers (gardiens)** : Ce sont les joueurs les plus disciplinés. Leur position spécifique, peu sujette aux duels, les met rarement en situation de faute. 
