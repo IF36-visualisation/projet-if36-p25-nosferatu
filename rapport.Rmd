@@ -731,3 +731,89 @@ L’analyse montre des différences intéressantes entre les postes :
 **Defenders (défenseurs)** : Bien que très sollicités défensivement, ils ne sont pas systématiquement les plus sanctionnés, ce qui peut indiquer une plus grande maîtrise dans l’engagement physique.
 
 **Goalkeepers (gardiens)** : Ce sont les joueurs les plus disciplinés. Leur position spécifique, peu sujette aux duels, les met rarement en situation de faute. 
+
+
+# Question 7 : Quel type de but est le plus fréquent en Premier League ? (tête, pied droit, pied gauche)
+
+Pour répondre à cette question, nous avons comparé les trois types de buts enregistrés pour chaque joueur : les buts marqués de la tête (Headed goals), du pied droit (Goals with right foot), et du pied gauche (Goals with left foot). L’objectif est d’identifier quelle méthode est la plus utilisée par les joueurs pour marquer.
+
+Nous avons représenté les moyennes de chaque type de but à l’aide d’un graphique en barres groupées.
+
+```{r echo=FALSE}
+
+# 选取三种进球方式并计算平均值
+df_goals <- data %>%
+  summarise(
+    `Headed goal` = mean(Headed.goals, na.rm = TRUE),
+    `Right foot` = mean(Goals.with.right.foot, na.rm = TRUE),
+    `Left foot` = mean(Goals.with.left.foot, na.rm = TRUE)
+  ) %>%
+  pivot_longer(cols = everything(), names_to = "GoalType", values_to = "AverageGoals")
+
+# 绘图：条形图
+ggplot(df_goals, aes(x = GoalType, y = AverageGoals, fill = GoalType)) +
+  geom_bar(stat = "identity", width = 0.6) +
+  labs(
+    title = "Average Number of Goals by Type",
+    x = "Type of Goal",
+    y = "Average Goals per Player"
+  ) +
+  scale_fill_brewer(palette = "Pastel1") +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
+
+```
+
+Résultats observés
+Pied droit : La majorité des buts sont marqués du pied droit, ce qui s’explique par la dominance des joueurs droitiers dans le football professionnel.
+Pied gauche : Les buts du pied gauche sont un peu moins fréquents mais restent significatifs.
+Tête : Les buts de la tête sont les moins nombreux en moyenne.
+
+Conclusion
+La frappe du pied droit est de loin la méthode la plus utilisée pour marquer, suivie par le pied gauche. Les buts de la tête restent plus rares et peuvent dépendre davantage du poste et du style de jeu.
+Pour approfondir la question, nous sommes curieux de savoir si cela est lié au style du club auquel appartient le joueur et si le style d'entraînement du club a une influence sur les résultats.
+
+Traduit avec DeepL.com (version gratuite)
+
+```{r echo=FALSE}
+
+# 计算每个俱乐部的平均进球方式
+df_club <- data %>%
+  group_by(Club) %>%
+  summarise(
+    `Headed goal` = mean(Headed.goals, na.rm = TRUE),
+    `Left foot` = mean(Goals.with.left.foot, na.rm = TRUE),
+    `Right foot` = mean(Goals.with.right.foot, na.rm = TRUE)
+  ) %>%
+  pivot_longer(cols = -Club, names_to = "GoalType", values_to = "AvgGoals")
+
+# 选出进球最多的前 10 个俱乐部
+top_clubs <- df_club %>%
+  group_by(Club) %>%
+  summarise(Total = sum(AvgGoals)) %>%
+  top_n(10, Total) %>%
+  pull(Club)
+
+# 过滤数据用于绘图
+df_plot <- df_club %>%
+  filter(Club %in% top_clubs)
+
+# 绘图
+ggplot(df_plot, aes(x = GoalType, y = AvgGoals, fill = GoalType)) +
+  geom_col() +
+  facet_wrap(~ Club) +
+  labs(
+    title = "Comparison of Goal Types by Club",
+    x = "Type of Goal",
+    y = "Average Goals per Player"
+  ) +
+  scale_fill_brewer(palette = "Pastel1") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
+```
+Bien que la tendance générale reste conforme à l’analyse précédente, des clubs comme Crystal Palace et Everton se démarquent par un nombre de buts de la tête légèrement supérieur à la moyenne, ce qui peut suggérer une plus grande dépendance aux centres latéraux ou aux tactiques de jeu aérien. En revanche, Manchester City et Tottenham Hotspur se distinguent par un nombre particulièrement élevé de buts marqués du pied droit, ce qui indique que leurs principaux joueurs offensifs sont majoritairement droitiers et présentent une grande efficacité devant le but. De manière générale, on observe encore des différences structurelles dans les types de buts selon les clubs, probablement influencées par la répartition des pieds dominants des joueurs, les styles tactiques des équipes ou encore les caractéristiques de leurs joueurs clés.
