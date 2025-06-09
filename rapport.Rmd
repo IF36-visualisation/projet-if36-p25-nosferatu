@@ -819,3 +819,58 @@ ggplot(df_plot, aes(x = GoalType, y = AvgGoals, fill = GoalType)) +
 Bien que la tendance générale reste conforme à l’analyse précédente, des clubs comme Crystal Palace et Everton se démarquent par un nombre de buts de la tête légèrement supérieur à la moyenne, ce qui peut suggérer une plus grande dépendance aux centres latéraux ou aux tactiques de jeu aérien. 
 En revanche, Manchester City et Tottenham Hotspur se distinguent par un nombre particulièrement élevé de buts marqués du pied droit, ce qui indique que leurs principaux joueurs offensifs sont majoritairement droitiers et présentent une grande efficacité devant le but. 
 De manière générale, on observe encore des différences structurelles dans les types de buts selon les clubs, probablement influencées par la répartition des pieds dominants des joueurs, les styles tactiques des équipes ou encore les caractéristiques de leurs joueurs clés.
+
+# Question 8 : Quel est le style de jeu des clubs
+L'objectif de cette question est de déceler des caractéristiques qui différencie 
+les clubs au niveau du jeu pour cela on va comparer leurs caractéristiques dans chaque facette du jeu : 
+- Jeu direct (LongBalls, ThroughBalls)
+- Possession (PassesPerMatch)
+- Pressing (Recoveries, DuelsWon)
+- Tir (ShootingFromDistance)
+- Jeu sur les ailes (Crosses, CrossAccuracy)
+
+```{r echo=FALSE}
+# Nettoyage des variables nécessaires
+club_styles <- club_stats %>%
+  mutate(
+    Jeu_Direct = (LongBalls + ThroughBalls) / 2,
+    Possession = PassesPerMatch,
+    Pressing = (Recoveries + DuelsWon) / 2,
+    Tir = ShootingFromDistance,
+    Ailes = (Crosses + CrossAccuracy) / 2
+  ) %>%
+  select(Club, Jeu_Direct, Possession, Pressing, Tir, Ailes)
+
+# 2. Normalisation (0-1)
+normalized_styles <- as.data.frame(scale(club_styles[,-1],
+                                         center = apply(club_styles[,-1], 2, min, na.rm = TRUE),
+                                         scale = apply(club_styles[,-1], 2, max, na.rm = TRUE) - apply(club_styles[,-1], 2, min, na.rm = TRUE)))
+
+rownames(normalized_styles) <- club_styles$Club
+
+# 3. Affichage des radar charts : 2x2 par page
+par(mfrow = c(2, 2), mar = c(2, 2, 4, 2))  # Ajuste le layout ici (ex: 3x3 pour + clubs par page)
+
+for (club in rownames(normalized_styles)) {
+  radar_data <- rbind(rep(1, ncol(normalized_styles)),
+                      rep(0, ncol(normalized_styles)),
+                      normalized_styles[club, ])
+  
+  radarchart(radar_data,
+             axistype = 1,
+             pcol = "blue",
+             pfcol = adjustcolor("blue", alpha.f = 0.25),
+             plwd = 2,
+             cglcol = "grey", cglty = 1,
+             caxislabels = seq(0, 1, 0.2),
+             vlcex = 1,
+             title = club,
+             cex.main = 1.5)
+}
+
+```
+On constate que certains club ont un style particulier de jeu comme Fulham et Chelsea sont basés
+sur la possession, et d'autre comme Burnley et Crystal-palace basés sur un jeu de pressing et de jeu direct.
+D'autres club sont plus équilibrés. Ce qui nous demande à savoir parmi ces clubs quel style de jeu est le plus efficace.
+Pour cela, on peut essayer de corréler avec le nombre de buts.
+
