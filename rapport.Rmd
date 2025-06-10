@@ -355,17 +355,16 @@ L'objectif de se poser cette question, c'est d'avoir une idée de la performance
 On va donc se concentrer sur les joueurs qui ont marqué le plus de buts.
 
 ```{r echo=FALSE}
-# Sélectionner les 10 meilleurs buteurs
 top_scorers <- data_clean %>%
   arrange(desc(Goals)) %>%
   slice(1:10)
 
 top_scorer_plot <- ggplot(top_scorers, aes(x = reorder(Name, Goals), y = Goals)) +
   geom_bar(stat = "identity", fill = "steelblue") +
-  coord_flip() +  # Met les barres horizontales
   labs(title = "Top 10 des buteurs - Premier League",
        x = "Joueur",
-       y = "Nombre de buts")
+       y = "Nombre de buts") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 top_scorer_plot
 ```
@@ -425,7 +424,12 @@ data_clean$`Shooting.accuracy..` <- as.numeric(gsub("%", "", data_clean$`Shootin
 ggplot(data_clean, aes(x = Shooting.accuracy.., y = Goals_per_match)) +
   geom_point(color = "blue", size = 3, alpha = 0.7) + 
   geom_smooth(method = "lm", se = FALSE, color = "red", linetype = "dashed") +
-  labs(title = "Précision des tirs vs moyenne de buts par match", x = "Précision des tirs (%)", y = "Buts par match") 
+  scale_x_continuous(labels = function(x) paste0(x * 100, "%")) +
+  labs(
+    title = "Précision des tirs vs moyenne de buts par match",
+    x = "Précision des tirs (%)",
+    y = "Buts par match"
+  )
 ```
 
 On constate qu'il y a une corrélation positive entre la précision des tirs et le nombre de buts marqués par match.
@@ -820,7 +824,7 @@ Bien que la tendance générale reste conforme à l’analyse précédente, des 
 En revanche, Manchester City et Tottenham Hotspur se distinguent par un nombre particulièrement élevé de buts marqués du pied droit, ce qui indique que leurs principaux joueurs offensifs sont majoritairement droitiers et présentent une grande efficacité devant le but. 
 De manière générale, on observe encore des différences structurelles dans les types de buts selon les clubs, probablement influencées par la répartition des pieds dominants des joueurs, les styles tactiques des équipes ou encore les caractéristiques de leurs joueurs clés.
 
-# Question 8 : Quel est le style de jeu des clubs
+# Question 8 : Quel est le style de jeu des clubs ? 
 L'objectif de cette question est de déceler des caractéristiques qui différencie 
 les clubs au niveau du jeu pour cela on va comparer leurs caractéristiques dans chaque facette du jeu : 
 - Jeu direct (LongBalls, ThroughBalls)
