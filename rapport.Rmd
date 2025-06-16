@@ -106,12 +106,12 @@ top_joueurs <- data %>% arrange(desc(Goals)) %>% slice_head(n = 10)
 top_joueurs <- top_joueurs %>%
   mutate(label = paste(Name, "(", Nationality, ")", sep = ""))
 
-ggplot(top_joueurs, aes(x = reorder(label, Goals), y = Goals)) +
+ggplot(top_joueurs, aes(x = reorder(label, -Goals), y = Goals)) +
   geom_col(fill = "skyblue", color = "darkblue") +
   theme_minimal() +
   labs(title = "Top 10 des meilleurs buteurs",
        x = "Joueur (Nationalité)",
-       y = "Nombre de buts")+coord_flip()
+       y = "Nombre de buts") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 D'abord, nous avons analysé les 10 meilleurs buteurs de la Premier League.
@@ -142,6 +142,13 @@ ggplot(top_nation_data, aes(x = Nationality, y = Goals)) +
 theme_minimal() +  
   geom_boxplot(fill = "skyblue", color = "darkblue") +
   labs(title = "Distribution des buts par nationalité (Top 10 pays)",
+       x = "Nationalité",
+       y = "Nombre de buts")
+ggplot(top_nation_data, aes(x = Nationality, y = Goals)) +
+  theme_minimal() +  
+  geom_boxplot(fill = "skyblue", color = "darkblue") +
+  coord_cartesian(ylim = c(0, quantile(top_nation_data$Goals, 0.9))) +  # zoom 
+  labs(title = "Distribution des buts par nationalité (zoom sur la distribution centrale )",
        x = "Nationalité",
        y = "Nombre de buts")
 
