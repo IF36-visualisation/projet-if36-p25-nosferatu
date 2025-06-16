@@ -686,32 +686,33 @@ Pour répondre à cette question, nous avons calculé les moyennes des fautes, d
 Nous avons utilisé un graphique en coordonnées parallèles pour visualiser ces différences : chaque ligne correspond à un poste, et les axes représentent les trois types de sanctions, normalisés pour permettre une comparaison équitable.
 
 ```{r echo=FALSE}
-df_parallel <- data %>%
+# Préparation des données : passage au format long
+df_long <- data %>%
   group_by(Position) %>%
   summarise(
     Fouls = mean(Fouls, na.rm = TRUE),
     Yellow.cards = mean(Yellow.cards, na.rm = TRUE),
     Red.cards = mean(Red.cards, na.rm = TRUE)
+  ) %>%
+  pivot_longer(
+    cols = c(Fouls, Yellow.cards, Red.cards),
+    names_to = "Sanction",
+    values_to = "Moyenne"
   )
 
-ggparcoord(
-  df_parallel,
-  columns = 2:4, 
-  groupColumn = "Position", 
-  scale = "globalminmax", 
-  alphaLines = 0.7, 
-  showPoints = TRUE 
-) +
-  scale_color_viridis_d(name = "Poste") + 
+# Barplot groupé
+ggplot(df_long, aes(x = Sanction, y = Moyenne, fill = Position)) +
+  geom_col(position = position_dodge(width = 0.8), width = 0.7) +
+  scale_fill_viridis_d(name = "Poste") +
   labs(
     title = "Comparaison des sanctions moyennes par poste",
     x = "Type de sanction",
-    y = "Moyenne normalisée"
+    y = "Moyenne"
   ) +
   theme_minimal(base_size = 10) +
   theme(
     plot.title = element_text(face = "bold", hjust = 0.5, size = 12),
-    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.x = element_text(angle = 30, hjust = 1),
     legend.position = "right"
   )
 ```
