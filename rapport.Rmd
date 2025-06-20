@@ -886,3 +886,31 @@ sur la possession, et d'autre comme Burnley et Crystal-palace basés sur un jeu 
 D'autres club sont plus équilibrés. Ce qui nous demande à savoir parmi ces clubs quel style de jeu est le plus efficace.
 Pour cela, on peut essayer de corréler avec le nombre de buts.
 
+# Question 9: Quels sont les clubs les plus performants offensivement cette saison en Premier League ? (graphique fait par shiny)
+
+![](shiny/shiny_graphique.png)
+
+En croisant les styles de jeu identifiés (possession, pressing, jeu direct...) avec le classement des clubs selon le nombre de buts marqués, on observe que plusieurs approches peuvent mener à l’efficacité offensive, à condition d’être bien exécutées.
+
+## Clubs performants
+Manchester City domine nettement : leur style basé sur la possession, le pressing haut et la créativité collective se traduit par une production offensive exceptionnelle.
+
+Liverpool, avec un jeu rapide et intense sur les ailes, confirme l'efficacité d’un pressing fort et d’attaques directes bien menées.
+
+Tottenham adopte un jeu plus vertical, exploitant parfaitement les transitions et la finition de joueurs comme Son ou Kane.
+
+## Surprise
+Crystal Palace, 4e, surprend par son efficacité. Son style plus direct et son jeu de contre semblent avoir été exploités au maximum, malgré un profil d'équipe plus modeste.
+
+## Clubs décevants
+Arsenal, seulement 9e, montre que la possession seule ne suffit pas sans efficacité dans le dernier tiers.
+
+Chelsea, 10e, illustre une difficulté à transformer ses occasions malgré un effectif offensif. Leur manque de cohérence dans le style de jeu pourrait expliquer cette contre-performance.
+
+## En résumé
+Aucun style ne garantit à lui seul le succès offensif. Ce sont la qualité d'exécution, l'adéquation entre le style et les joueurs, et la régularité qui semblent déterminer l'efficacité devant le but.
+
+
+
+
+
